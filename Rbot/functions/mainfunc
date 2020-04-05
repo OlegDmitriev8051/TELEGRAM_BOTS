@@ -1,0 +1,41 @@
+
+import (
+	"fmt"
+	"sort"
+
+	f "github.com/TELEGRAM/TELEGRAM_BOTS/RANDOMBOT/functions"
+)
+
+func masin() {
+
+	//getting a slice of keys from a map of students
+	sKeys := make([]int, 0, len(students))
+	for k := range students {
+		sKeys = append(sKeys, k)
+	}
+
+	//sorting slice in ascending order
+	sort.Slice(sKeys, func(i, j int) bool {
+		return sKeys[i] < sKeys[j]
+	})
+	fmt.Println(sKeys)
+
+	//deleting some students
+	i := 2
+	sKeys = f.Remove(sKeys, i-1)
+	fmt.Println(sKeys)
+
+	// random shuffling
+	sKeys = f.Shuffle(sKeys)
+	fmt.Println(sKeys)
+
+	//how much students we need
+	n := 3
+	for i, v := range sKeys {
+		if i == n {
+			break
+		}
+		fmt.Println(students[v])
+	}
+
+}

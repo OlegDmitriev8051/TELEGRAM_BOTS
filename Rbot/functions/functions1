@@ -1,0 +1,21 @@
+//package functions
+
+import (
+	"math/rand"
+	"time"
+)
+
+func Shuffle(slice []int) []int {
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+	ret := make([]int, len(slice))
+	perm := r.Perm(len(slice))
+	for i, randIndex := range perm {
+		ret[i] = slice[randIndex]
+	}
+	return ret
+}
+
+func Remove(slice []int, i int) []int {
+	rSlice := append(slice[:i], slice[i+1:]...)
+	return rSlice
+}
