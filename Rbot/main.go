@@ -13,10 +13,10 @@ var mainMenu = tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButton("Начать консультацию"),
 	),
 )
-var deleteMenu = tgbotapi.NewInlineKeyboardMarkup(
-	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonData("Да", "Да"),
-		tgbotapi.NewInlineKeyboardButtonData("Нет", "Нет"),
+var deleteMenu = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yes"),
+		tgbotapi.NewKeyboardButton("No"),
 	),
 )
 
@@ -77,7 +77,7 @@ func main() {
 
 				}
 			} else {
-				// if user pressed "Начать консультацию"
+				//  "Начать консультацию"
 				if update.Message.Text == mainMenu.Keyboard[0][0].Text {
 					fmt.Printf("Mesage: %s\n", update.Message.Text)
 
@@ -94,31 +94,31 @@ func main() {
 
 					f.ShowStudents(update, bot, studKeys)
 					//Show keyboard
-					msgConfig.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
+					//msgConfig.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
 
-					for i := 1; i <= len(f.Students); i++ {
-						//New keyboard
-						msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Кого-нибудь пощадим?")
-						msg.ReplyMarkup = deleteMenu
-						bot.Send(msg)
-						if update.Message.Text == deleteMenu.InlineKeyboard[0][1].Text {
-							msgConfig := tgbotapi.NewMessage(
-								update.Message.Chat.ID,
-								"Хороший выбор,"+update.Message.From.FirstName+
-									"Скольких надо отчислить?")
-							bot.Send(msgConfig)
-							break
-							// if user pressed "Да"
-						} else if update.Message.Text == deleteMenu.InlineKeyboard[0][0].Text {
-							msgConfig.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
-							msgConfig := tgbotapi.NewMessage(
-								update.Message.Chat.ID,
-								"Введи порядковый номер студента")
-							bot.Send(msgConfig)
-							fmt.Printf("message: %s\n", update.Message.Text)
-						}
-
-					}
+					//New keyboard
+					msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Кого-нибудь пощадим?")
+					msg.ReplyMarkup = deleteMenu
+					bot.Send(msg)
+				}
+				//	if user pressed "No"
+				if update.Message.Text == deleteMenu.Keyboard[0][1].Text {
+					msgConfig := tgbotapi.NewMessage(
+						update.Message.Chat.ID,
+						"Хороший выбор, "+update.Message.From.FirstName+"!"+
+							"ForwardMe")
+					msgConfig.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+					bot.Send(msgConfig)
+					fmt.Printf("message: %s\n", update.Message.Text)
+				}
+				// if user pressed "Да"
+				if update.Message.Text == deleteMenu.Keyboard[0][0].Text {
+					msgConfig := tgbotapi.NewMessage(
+						update.Message.Chat.ID,
+						"Введи порядковый номер студента")
+					msgConfig.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+					bot.Send(msgConfig)
+					fmt.Printf("message: %s\n", update.Message.Text)
 				}
 
 				// Who is it? Text of message
@@ -127,6 +127,8 @@ func main() {
 					update.Message.Chat.ID,
 					update.Message.Text)
 			}
+		} else {
+			fmt.Printf("not message: %+v\n", update)
 		}
 	}
 

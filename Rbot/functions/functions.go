@@ -40,8 +40,7 @@ func ShowStudents(update tgbotapi.Update, bot *tgbotapi.BotAPI, studKeys []int) 
 	for i := 0; i < len(studKeys); i++ {
 		msgConfig := tgbotapi.NewMessage(
 			update.Message.Chat.ID,
-			strconv.Itoa(studKeys[i])+
-				"    "+Students[studKeys[i]])
+			Students[studKeys[i]])
 		bot.Send(msgConfig)
 	}
 
