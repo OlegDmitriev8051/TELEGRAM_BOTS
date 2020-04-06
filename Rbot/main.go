@@ -6,12 +6,17 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 
 	f "github.com/TELEGRAM/TELEGRAM_BOTS/Rbot/functions"
-	//	"io/ioutill"
 )
 
 var mainMenu = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Начать консультацию"),
+	),
+)
+var deleteMenu = tgbotapi.NewInlineKeyboardMarkup(
+	tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData("Да", "Да"),
+		tgbotapi.NewInlineKeyboardButtonData("Нет", "Нет"),
 	),
 )
 
@@ -69,9 +74,10 @@ func main() {
 					msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Вот что я могу:")
 					msg.ReplyMarkup = mainMenu
 					bot.Send(msg)
+
 				}
 			} else {
-				// if user clicked "Начать консультацию"
+				// if user pressed "Начать консультацию"
 				if update.Message.Text == mainMenu.Keyboard[0][0].Text {
 					fmt.Printf("Mesage: %s\n", update.Message.Text)
 
@@ -81,11 +87,38 @@ func main() {
 					msgConfig := tgbotapi.NewMessage(
 						update.Message.Chat.ID,
 						"Я взял на карандаш следующих студентов:")
-					bot.Send(msgConfig)
-					f.ShowStudents(update, bot, studKeys)
-					tgbotapi.NewRemoveKeyboard(false)
-					//bot.Send(msg)
 
+					//Hide keyboard
+					msgConfig.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+					bot.Send(msgConfig)
+
+					f.ShowStudents(update, bot, studKeys)
+					//Show keyboard
+					msgConfig.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
+
+					for i := 1; i <= len(f.Students); i++ {
+						//New keyboard
+						msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Кого-нибудь пощадим?")
+						msg.ReplyMarkup = deleteMenu
+						bot.Send(msg)
+						if update.Message.Text == deleteMenu.InlineKeyboard[0][1].Text {
+							msgConfig := tgbotapi.NewMessage(
+								update.Message.Chat.ID,
+								"Хороший выбор,"+update.Message.From.FirstName+
+									"Скольких надо отчислить?")
+							bot.Send(msgConfig)
+							break
+							// if user pressed "Да"
+						} else if update.Message.Text == deleteMenu.InlineKeyboard[0][0].Text {
+							msgConfig.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+							msgConfig := tgbotapi.NewMessage(
+								update.Message.Chat.ID,
+								"Введи порядковый номер студента")
+							bot.Send(msgConfig)
+							fmt.Printf("message: %s\n", update.Message.Text)
+						}
+
+					}
 				}
 
 				// Who is it? Text of message
@@ -93,11 +126,7 @@ func main() {
 					update.Message.From.FirstName,
 					update.Message.Chat.ID,
 					update.Message.Text)
-				// My first message
-
 			}
-		} else {
-			fmt.Printf("not message: %+v\n", update)
 		}
 	}
 
