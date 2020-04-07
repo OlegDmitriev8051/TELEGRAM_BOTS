@@ -1,47 +1,42 @@
 package functions
 
 import (
-	"fmt"
-	"sort"
-	"strconv"
+	// "fmt"
+	// "sort"
+	// "strconv"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func Atoi(num string) int {
-	i, _ := strconv.Atoi(num)
-	return i
-}
-
-//initializing of keys from a map of students
-func FillStudKeys(studKeys []int) []int {
-
-	for k := range Students {
-		studKeys = append(studKeys, k)
-	}
-	//deleting zeroValue
-	//studKeys = append(studKeys[:0], studKeys[1:]...)
-	return studKeys
-}
-
-//sorting slice in ascending order
-func StreamlineStudentsMap(studKeys []int) []int {
-	sort.Slice(studKeys, func(i, j int) bool {
-		return studKeys[i] < studKeys[j]
-	})
-	return studKeys
-}
-
-func ShowStudents(update tgbotapi.Update, bot *tgbotapi.BotAPI, studKeys []int) {
-	fmt.Println(studKeys)
-	fmt.Println(Students[1])
-	fmt.Println(Students[16])
-
-	for i := 0; i < len(studKeys); i++ {
+//ShowSlice отправляет сообщения с именами студентов,
+//n - число студентов, которых надо напечатать
+func ShowSlice(update tgbotapi.Update, bot *tgbotapi.BotAPI, studSlice []string, n int) {
+	for i := 0; i < n; i++ {
 		msgConfig := tgbotapi.NewMessage(
 			update.Message.Chat.ID,
-			Students[studKeys[i]])
+			studSlice[i])
 		bot.Send(msgConfig)
 	}
+}
 
+//IsContains проверяет содержится ли студент в списке
+func IsContains(message string, studSlice []string) bool {
+	for _, student := range studSlice {
+		if student == message {
+			return true
+		}
+	}
+	return false
+}
+
+func RemoveStudents(message string, studSlice []string) []string {
+
+	var rSlice []string
+	for i, student := range studSlice {
+		if student == message {
+			rSlice = append(studSlice[:i], studSlice[i+1:]...)
+		}
+	}
+
+	return rSlice
 }
